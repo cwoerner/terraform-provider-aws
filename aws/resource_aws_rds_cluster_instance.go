@@ -84,6 +84,12 @@ func resourceAwsRDSClusterInstance() *schema.Resource {
 				Required: true,
 			},
 
+			"engine": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default:  "aurora",
+			},
+
 			"db_parameter_group_name": {
 				Type:     schema.TypeString,
 				Optional: true,
@@ -176,7 +182,7 @@ func resourceAwsRDSClusterInstanceCreate(d *schema.ResourceData, meta interface{
 	createOpts := &rds.CreateDBInstanceInput{
 		DBInstanceClass:         aws.String(d.Get("instance_class").(string)),
 		DBClusterIdentifier:     aws.String(d.Get("cluster_identifier").(string)),
-		Engine:                  aws.String("aurora"),
+		Engine:                  aws.String(d.Get("engine").(string)),
 		PubliclyAccessible:      aws.Bool(d.Get("publicly_accessible").(bool)),
 		PromotionTier:           aws.Int64(int64(d.Get("promotion_tier").(int))),
 		AutoMinorVersionUpgrade: aws.Bool(d.Get("auto_minor_version_upgrade").(bool)),
@@ -293,6 +299,7 @@ func resourceAwsRDSClusterInstanceRead(d *schema.ResourceData, meta interface{})
 	d.Set("publicly_accessible", db.PubliclyAccessible)
 	d.Set("cluster_identifier", db.DBClusterIdentifier)
 	d.Set("instance_class", db.DBInstanceClass)
+	d.Set("engine", db.Engine)
 	d.Set("identifier", db.DBInstanceIdentifier)
 	d.Set("dbi_resource_id", db.DbiResourceId)
 	d.Set("storage_encrypted", db.StorageEncrypted)
